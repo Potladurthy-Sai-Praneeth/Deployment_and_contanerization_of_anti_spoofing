@@ -186,6 +186,7 @@ async def authenticate_user(
             )
         
         # Authenticate user
+        global authenticator
         is_authenticated, user_name = await authenticator.authenticate(
             frame,
             known_face_embedding_dict=known_faces_dict,
