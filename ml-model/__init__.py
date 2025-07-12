@@ -1,2 +1,2 @@
-from authenticate import *
-from generate_embedding import *
+from .authenticate import FaceAuthenticator
+from .generate_embedding import generate_face_embedding

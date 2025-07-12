@@ -35,7 +35,7 @@ class FaceAuthenticator:
         )
         return session
 
-    async def preprocess_image(self,image, target_size=(252, 252)):
+    def preprocess_image(self, image, target_size=(252, 252)):  # Removed async - not needed
         if isinstance(image, np.ndarray):
             if len(image.shape) == 3 and image.shape[2] == 3:
                 image = image[:, :, ::-1]  # BGR to RGB
@@ -71,7 +71,7 @@ class FaceAuthenticator:
         else:
             frame_rgb = frame
 
-        preprocessed_frame = await self.preprocess_image(frame_rgb)
+        preprocessed_frame = self.preprocess_image(frame_rgb)  # Removed await
 
         depth_input = {self.depth_map_model.get_inputs()[0].name: preprocessed_frame}
         depth_map,output = self.depth_map_model.run(None, depth_input)
@@ -80,7 +80,7 @@ class FaceAuthenticator:
         
         return depth_map,prediction,frame_rgb
 
-    async def get_user_name(self, frame_rgb, known_face_embeddings, user_names, tolerance=0.65):
+    def get_user_name(self, frame_rgb, known_face_embeddings, user_names, tolerance=0.65):  # Removed async - not needed
         '''
         This function takes a frame as input and returns the name of the user if authenticated.
         Args:
@@ -146,7 +146,7 @@ class FaceAuthenticator:
             depth_map, prediction, frame_rgb = await self.get_spoof_prediction(image)
             if prediction == 1: 
                 self.is_authenticated = True
-                user_name = await self.get_user_name(frame_rgb, known_face_embeddings, user_names, tolerance=threshold)
+                user_name = self.get_user_name(frame_rgb, known_face_embeddings, user_names, tolerance=threshold)  # Removed await
                 return self.is_authenticated, user_name
             else:
                 self.is_authenticated = False

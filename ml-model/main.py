@@ -1,17 +1,13 @@
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException, status
-from fastapi.responses import JSONResponse, HTMLResponse
-from fastapi.staticfiles import StaticFiles
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from typing import Optional, List
-from contextlib import asynccontextmanager
 import numpy as np
 import base64
-import os
 import json
 from io import BytesIO
 from PIL import Image
-import face_recognition
 from generate_embedding import generate_face_embedding
 from authenticate import FaceAuthenticator
 import uvicorn
@@ -39,7 +35,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"], 
     allow_credentials=True,
-    allow_methods=["POST"],
+    allow_methods=["*"],  # Changed from ["POST"] to ["*"] for consistency
     allow_headers=["*"],
 )
 
@@ -124,7 +120,7 @@ async def add_user(
         
         image_array = np.array(pil_image)
         
-        # Generate embeddings - remove await since function is not async
+        # Generate embeddings
         embeddings = generate_face_embedding(image_array)
         
         if embeddings is None:
@@ -138,8 +134,8 @@ async def add_user(
         return AddUserResponse(
             is_saved=True,
             user_name=user_name,
-            message=f"User '{user_name}' added successfully to the database",
-            embedding=embeddings.tolist()  # Convert numpy array to list for JSON serialization
+            message=f"User '{user_name}' added successfully",  # Removed "to the database" for consistency
+            embedding=embeddings.tolist()
         )
     
     except Exception as e:
@@ -186,7 +182,6 @@ async def authenticate_user(
             )
         
         # Authenticate user
-        global authenticator
         is_authenticated, user_name = await authenticator.authenticate(
             frame,
             known_face_embedding_dict=known_faces_dict,

@@ -20,9 +20,6 @@ class AddUserResponse(BaseModel):
     user_name: str
     is_saved: bool
 
-class FetchAllUsersResponse(BaseModel):
-    users: dict
-
 class FetchUserNamesResponse(BaseModel):
     user_names: List[str]
 

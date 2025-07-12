@@ -12,4 +12,4 @@ RUN mkdir -p /api/database
 
 EXPOSE 8001
 
-CMD ['python', 'main.py']
+CMD ["python", "main.py"]
