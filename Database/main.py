@@ -68,7 +68,7 @@ if not os.path.exists(db_path):
 # Global variables
 database_connector = Database(db_path=db_path)
 ML_MODEL_PORT = 8000  # Port where the ML model service is running
-ML_SERVICE_URL = f"http://ml-model:{ML_MODEL_PORT}"  # URL of the ML service
+ML_SERVICE_URL = os.getenv("ML_SERVICE_URL", f"http://ml-model:{ML_MODEL_PORT}")
 
 
 @api.get("/getAllUsers", response_model=FetchUserNamesResponse)
@@ -76,7 +76,7 @@ async def get_all_users():
     """Fetch all users and their embeddings from the database."""
     try:
         results = await database_connector.get_registered_users()
-        return FetchUserNamesResponse(users=results)
+        return FetchUserNamesResponse(user_names=results)  # Fixed: changed 'users' to 'user_names'
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

@@ -1,0 +1,74 @@
+version: '3.8'
+
+services:
+  ml-model:
+    build: 
+      context: ./ml-model
+      dockerfile: Dockerfile
+    container_name: anti-spoofing-ml-model
+    volumes:
+      - ml-models:/app/models
+    ports:
+      - "8000:8000"
+    networks:
+      - anti-spoofing-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/docs"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+  
+  database:
+    build:
+      context: ./Database
+      dockerfile: Dockerfile
+    container_name: anti-spoofing-database
+    volumes:
+      - db-data:/api/database
+    depends_on:
+      ml-model:
+        condition: service_healthy
+    ports:
+      - "8001:8001"
+    networks:
+      - anti-spoofing-network
+    environment:
+      - ML_SERVICE_URL=http://ml-model:8000
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/docs"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+  
+  ui:
+    build:
+      context: ./UI
+      dockerfile: Dockerfile
+    container_name: anti-spoofing-ui
+    depends_on:
+      database:
+        condition: service_healthy
+    ports:
+      - "5000:5000"
+    networks:
+      - anti-spoofing-network
+    environment:
+      - REACT_APP_API_URL=http://localhost:8001
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+volumes:
+  ml-models:
+    driver: local
+  db-data:
+    driver: local
+
+networks:
+  anti-spoofing-network:
+    driver: bridge
