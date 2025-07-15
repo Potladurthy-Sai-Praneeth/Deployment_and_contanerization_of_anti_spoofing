@@ -116,7 +116,7 @@ async def add_user(image: UploadFile = File(..., description="User's face image"
                 )
 
             ml_response = response.json()
-            print(f'ML Response: {ml_response}')
+            # print(f'ML Response: {ml_response}')
             
             if ml_response.get("is_saved") and ml_response.get("embedding"):
                 embedding = ml_response["embedding"]

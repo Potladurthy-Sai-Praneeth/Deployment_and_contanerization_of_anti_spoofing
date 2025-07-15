@@ -21,20 +21,20 @@ RUN apt-get update && apt-get install -y \
     gfortran \
     && rm -rf /var/lib/apt/lists/*
 
-RUN mkdir -p /app/models
+# RUN mkdir -p /app/models
+# COPY models/ /app/models/
+
+RUN curl -sSL "https://drive.usercontent.google.com/download?id=1p0abA5sYGOLoxdrJBuCz0iJyd5ZboJ6P&export=download" -o models.zip && \
+unzip models.zip -d /app && \
+rm models.zip || echo "Model download failed, ensure models are copied manually"
+RUN ls -la /app/models/
 
 COPY requirements.txt .
-COPY models/ /app/models/
-
-RUN ls -la /app/models/
 RUN pip install --no-cache-dir dlib==19.24.8
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-# RUN curl -sSL "https://drive.usercontent.google.com/download?id=1p0abA5sYGOLoxdrJBuCz0iJyd5ZboJ6P&export=download&confirm" -o models.zip && \
-#     unzip models.zip -d /app/models && \
-#     rm models.zip || echo "Model download failed, ensure models are copied manually"
 
 # RUN curl -sSL "https://drive.usercontent.google.com/download?id=1p0abA5sYGOLoxdrJBuCz0iJyd5ZboJ6P&export=download&confirm" -o models.zip && \
 #     unzip models.zip -d /tmp && \

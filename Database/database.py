@@ -37,7 +37,7 @@ class Database:
             pass
         
         print(f"Inserting user {user_name} into the collection...")
-        print(f"Embedding length: {len(embedding)}")
+        # print(f"Embedding length: {len(embedding)}")
         # Inserting a user_name , embedding pair into the collection
         self.collection.add(
             ids=[user_name],  # Use user_name as unique ID
@@ -54,14 +54,11 @@ class Database:
         
         print("Fetching all users from the collection...")
         results = self.collection.get(include=['documents', 'embeddings', 'metadatas'])
-        print(f'Found users ')
-        print(results)
 
-        if not results or results == {} or not results.get('documents') or not results.get('embeddings'):
+        if not results or not results.get('documents') or not results.get('embeddings'):
             return {}
             
-        return {doc: emb for doc, emb in zip(results['documents'], results['embeddings'])}
-        return {doc: emb for doc, emb in zip(results['documents'], results['embeddings'])}
+        return {doc: emb for doc, emb in zip(results['documents'], results['embeddings'].tolist())}
 
 
     async def get_registered_users(self):
