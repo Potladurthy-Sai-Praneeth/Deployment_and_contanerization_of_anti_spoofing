@@ -113,14 +113,16 @@ ls -la
 ```bash
 # Build all images and start services
 docker-compose up --build
-
+```
 #### 3. **Verify Deployment**
 ```bash
 # Check all services are healthy
 docker-compose ps
+```
 
 # Should show all services as "Up (healthy)"
 # If any service shows "Up (unhealthy)", check logs:
+```bash
 docker-compose logs <service-name>
 ```
 

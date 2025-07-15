@@ -24,7 +24,7 @@ class Database:
             raise ValueError("Collection is not initialized.")
 
         if embedding is None or not isinstance(embedding, list):
-            raise ValueError("Embedding must be a non-empty list. Found {type(embedding)}")
+            raise ValueError(f"Embedding must be a non-empty list. Found {type(embedding)}")
         
         # Check if user already exists
         try:
@@ -37,6 +37,7 @@ class Database:
             pass
         
         print(f"Inserting user {user_name} into the collection...")
+        print(f"Embedding length: {len(embedding)}")
         # Inserting a user_name , embedding pair into the collection
         self.collection.add(
             ids=[user_name],  # Use user_name as unique ID
@@ -46,20 +47,20 @@ class Database:
         )
 
         return True
-
     async def fetch_all(self):
         """Fetch all users and their embeddings from the collection."""
         if self.collection is None:
             raise ValueError("Collection is not initialized.")
         
         print("Fetching all users from the collection...")
-        results = self.collection.get()
+        results = self.collection.get(include=['documents', 'embeddings', 'metadatas'])
         print(f'Found users ')
         print(results)
 
-        if not results or results=={}:# and not results['documents'] or not results['embeddings']:
+        if not results or results == {} or not results.get('documents') or not results.get('embeddings'):
             return {}
             
+        return {doc: emb for doc, emb in zip(results['documents'], results['embeddings'])}
         return {doc: emb for doc, emb in zip(results['documents'], results['embeddings'])}
 
 
