@@ -41,6 +41,7 @@ const AuthenticationTab = () => {
       <h2>Face Authentication</h2>
       <p>Position your face in front of the camera and click "Capture Image" to authenticate.</p>
       
+      
       <div className="threshold-control">
         <label>Authentication Threshold: </label>
         <input
@@ -54,7 +55,7 @@ const AuthenticationTab = () => {
         <div className="threshold-value">{threshold}</div>
         <small>Lower values are more strict, higher values are more lenient</small>
       </div>
-
+      
       <CameraCapture 
         onCapture={handleCapture}
         disabled={isProcessing}

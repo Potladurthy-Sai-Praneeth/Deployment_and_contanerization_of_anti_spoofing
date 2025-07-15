@@ -116,7 +116,7 @@ async def add_user(image: UploadFile = File(..., description="User's face image"
                 )
 
             ml_response = response.json()
-            # print(f'ML Response: {ml_response}')
+            print(f'Response in Add user: {ml_response}')
             
             if ml_response.get("is_saved") and ml_response.get("embedding"):
                 embedding = ml_response["embedding"]
@@ -161,7 +161,7 @@ async def authenticate_user(
     """Authenticate a user by comparing against stored embeddings via ML service."""
     try:
         known_face_embeddings_dict = await database_connector.fetch_all()
-        print(f"Known face embeddings: {known_face_embeddings_dict}") 
+        # print(f"Known face embeddings: {known_face_embeddings_dict}") 
 
         if not known_face_embeddings_dict:
             raise HTTPException(
@@ -183,19 +183,19 @@ async def authenticate_user(
             )
 
             ml_response = response.json()
-            print(ml_response)
-            
+            print(f'Response in Authenticate user: {ml_response}')
+
             if response.status_code != 200:
                 raise HTTPException(
                     status_code=response.status_code,
                     detail=f"ML service error: {response.text}"
                 )
             
-            if ml_response.get("is_authenticated") is False:
-                raise HTTPException(
-                    status_code=status.HTTP_401_UNAUTHORIZED,
-                    detail="Authentication failed, user not recognized"
-                )
+            # if ml_response.get("is_authenticated") is False:
+            #     raise HTTPException(
+            #         status_code=status.HTTP_401_UNAUTHORIZED,
+            #         detail="Authentication failed, user not recognized"
+            #     )
             
             return AuthenticateResponse(
                 is_authenticated=ml_response.get("is_authenticated", False),

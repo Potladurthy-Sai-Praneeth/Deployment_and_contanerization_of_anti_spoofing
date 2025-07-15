@@ -92,7 +92,7 @@ class FaceAuthenticator:
         
         return depth_map,prediction,frame_rgb
 
-    def get_user_name(self, frame_rgb, known_face_embeddings, user_names, tolerance=0.65):  # Removed async - not needed
+    def get_user_name(self, frame_rgb, known_face_embeddings, user_names, tolerance=0.5):  # Removed async - not needed
         '''
         This function takes a frame as input and returns the name of the user if authenticated.
         Args:
