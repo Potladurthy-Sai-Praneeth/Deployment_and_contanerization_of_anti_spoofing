@@ -41,10 +41,9 @@ app.add_middleware(
 
 # Global variables
 image_size = (252, 252)
-models_folder = "models"
 provider = 'CPUExecutionProvider'  # Change to 'CUDAExecutionProvider' if GPU is available
 
-authenticator = FaceAuthenticator(models_folder=models_folder, execution_provider=provider, image_size=image_size)
+authenticator = FaceAuthenticator(execution_provider=provider, image_size=image_size)
 
 def decode_base64_image(image_data: str) -> np.ndarray:
     """Decode base64 image to numpy array using PIL"""
@@ -122,6 +121,7 @@ async def add_user(
         
         # Generate embeddings
         embeddings = generate_face_embedding(image_array)
+        print(f"Generated embeddings for user {user_name}: {embeddings}")
         
         if embeddings is None:
             return AddUserResponse(

@@ -24,14 +24,23 @@ RUN apt-get update && apt-get install -y \
 RUN mkdir -p /app/models
 
 COPY requirements.txt .
-RUN pip install dlib==19.24.8
+COPY models/ /app/models/
+
+RUN ls -la /app/models/
+RUN pip install --no-cache-dir dlib==19.24.8
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-RUN curl -sSL "https://drive.usercontent.google.com/download?id=1p0abA5sYGOLoxdrJBuCz0iJyd5ZboJ6P&export=download&confirm" -o models.zip && \
-    unzip models.zip -d /app/models && \
-    rm models.zip || echo "Model download failed, ensure models are copied manually"
+# RUN curl -sSL "https://drive.usercontent.google.com/download?id=1p0abA5sYGOLoxdrJBuCz0iJyd5ZboJ6P&export=download&confirm" -o models.zip && \
+#     unzip models.zip -d /app/models && \
+#     rm models.zip || echo "Model download failed, ensure models are copied manually"
+
+# RUN curl -sSL "https://drive.usercontent.google.com/download?id=1p0abA5sYGOLoxdrJBuCz0iJyd5ZboJ6P&export=download&confirm" -o models.zip && \
+#     unzip models.zip -d /tmp && \
+#     find /tmp -type f \( -name "*.onnx" -o -name "*.pkl" -o -name "*.pth" -o -name "*.h5" -o -name "*.pt" \) -exec cp {} /app/models/ \; && \
+#     ls -la /app/models/ && \
+#     rm -rf models.zip /tmp/* || echo "Model download failed, ensure models are copied manually"
 
 EXPOSE 8000
 

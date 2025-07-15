@@ -7,14 +7,26 @@ import onnxruntime
 
 
 class FaceAuthenticator:
-    def __init__(self, models_folder='models', execution_provider='CPUExecutionProvider', image_size=(252, 252)):
+    def __init__(self, execution_provider='CPUExecutionProvider', image_size=(252, 252)):
         # Load models
-        self.models_folder = models_folder
-        self.depth_model_name = os.listdir(os.path.join(os.getcwd(),models_folder))[0]
+        self.models_folder = os.getenv('MODELS_FOLDER', 'models')
+        self.depth_model_name = os.getenv('MODEL_FILE_NAME', 'anti_spoofing_quantized.onnx')
 
-        onnx.checker.check_model(onnx.load(os.path.join(self.models_folder, self.depth_model_name)))
+        model_path = os.path.join(self.models_folder, self.depth_model_name)
+    
+        # Check if model file exists
+        if not os.path.exists(model_path):
+            raise FileNotFoundError(f"Model file not found at: {model_path}")
+        
+        # Check if models folder exists and list contents
+        if os.path.exists(self.models_folder):
+            print(f"Models folder contents: {os.listdir(self.models_folder)}")
+        else:
+            print(f"Models folder does not exist: {self.models_folder}")
+        
+        onnx.checker.check_model(onnx.load(model_path))
         self.depth_map_model = self.create_inference_session(
-            os.path.join(self.models_folder, self.depth_model_name), 
+            model_path, 
             provider=execution_provider
         )
 
