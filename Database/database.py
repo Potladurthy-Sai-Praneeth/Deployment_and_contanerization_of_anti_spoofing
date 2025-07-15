@@ -47,6 +47,7 @@ class Database:
         )
 
         return True
+    
     async def fetch_all(self):
         """Fetch all users and their embeddings from the collection."""
         if self.collection is None:
@@ -55,10 +56,10 @@ class Database:
         print("Fetching all users from the collection...")
         results = self.collection.get(include=['documents', 'embeddings', 'metadatas'])
 
-        if not results or not results.get('documents') or not results.get('embeddings'):
+        if not results or not results.get('documents') or len(results.get('embeddings', [])) == 0:
             return {}
             
-        return {doc: emb for doc, emb in zip(results['documents'], results['embeddings'].tolist())}
+        return {doc: emb for doc, emb in zip(results['documents'], results['embeddings'])}
 
 
     async def get_registered_users(self):

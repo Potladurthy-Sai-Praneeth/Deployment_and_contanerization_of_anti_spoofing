@@ -37,7 +37,7 @@ services:
     networks:
       - anti-spoofing-network
     environment:
-      - ML_SERVICE_URL=http://localhost:8000
+      - ML_SERVICE_URL=http://ml-model:8000
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8001/docs"]
       interval: 30s
@@ -58,7 +58,7 @@ services:
     networks:
       - anti-spoofing-network
     environment:
-      - REACT_APP_API_URL=http://localhost:8001
+      - REACT_APP_API_URL=http://database:8001
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5000"]
       interval: 30s
