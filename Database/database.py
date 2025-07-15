@@ -59,7 +59,7 @@ class Database:
         if not results or not results.get('documents') or len(results.get('embeddings', [])) == 0:
             return {}
             
-        return {doc: emb for doc, emb in zip(results['documents'], results['embeddings'])}
+        return {doc: emb.tolist() for doc, emb in zip(results['documents'], results['embeddings'])}
 
 
     async def get_registered_users(self):

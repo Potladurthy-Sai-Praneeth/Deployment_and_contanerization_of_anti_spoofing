@@ -116,7 +116,7 @@ async def add_user(image: UploadFile = File(..., description="User's face image"
                 )
 
             ml_response = response.json()
-            print(f'ML Response: {ml_response}')
+            # print(f'ML Response: {ml_response}')
             
             if ml_response.get("is_saved") and ml_response.get("embedding"):
                 embedding = ml_response["embedding"]
@@ -161,8 +161,8 @@ async def authenticate_user(
     """Authenticate a user by comparing against stored embeddings via ML service."""
     try:
         known_face_embeddings_dict = await database_connector.fetch_all()
-        print(f"Known face embeddings: {known_face_embeddings_dict}")
-        
+        print(f"Known face embeddings: {known_face_embeddings_dict}") 
+
         if not known_face_embeddings_dict:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
