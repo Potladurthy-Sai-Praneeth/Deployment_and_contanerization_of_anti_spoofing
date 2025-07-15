@@ -28,13 +28,14 @@ class Database:
         
         # Check if user already exists
         try:
-            existing_users = self.collection.get(ids=[user_name])
+            existing_users = self.collection.get(include=['documents'])
             if existing_users and len(existing_users['documents']) > 0:
                 print(f"User {user_name} already exists in the collection. Skipping insertion.")
                 return False
-        except Exception:
+        except Exception as e:
             # User doesn't exist, continue with insertion
-            pass
+            print(f'Got exception {e} while checking for existing user {user_name}.')
+            return False
         
         print(f"Inserting user {user_name} into the collection...")
         # print(f"Embedding length: {len(embedding)}")

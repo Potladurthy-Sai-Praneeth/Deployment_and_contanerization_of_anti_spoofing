@@ -110,7 +110,7 @@ async def add_user(image: UploadFile = File(..., description="User's face image"
             )
 
             ml_response = response.json()
-            print(f'Response in Add user: {ml_response}')
+            # print(f'Response in Add user: {ml_response}')
 
             # if response.status_code != 200:
             #     raise HTTPException(
@@ -183,7 +183,7 @@ async def authenticate_user(
             )
 
             ml_response = response.json()
-            print(f'Response in Authenticate user: {ml_response}')
+            # print(f'Response in Authenticate user: {ml_response}')
 
             if response.status_code != 200:
                 raise HTTPException(

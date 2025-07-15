@@ -20,7 +20,7 @@ const AuthenticationTab = () => {
       setResult({
         type: response.is_authenticated ? 'success' : 'error',
         message: response.is_authenticated 
-          ? `Welcome back, ${response.user_name}!` 
+          ? (response.user_name && response.user_name !== null) ? `Welcome  ${response.user_name}!` : 'Looks like you have not registered yet. Please register first.'
           : 'Authentication failed. Face not recognized or potential spoofing detected.',
         userName: response.user_name
       });
