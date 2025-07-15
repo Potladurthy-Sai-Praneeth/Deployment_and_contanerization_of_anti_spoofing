@@ -109,14 +109,14 @@ async def add_user(image: UploadFile = File(..., description="User's face image"
                 timeout=30.0
             )
 
-            if response.status_code != 200:
-                raise HTTPException(
-                    status_code=response.status_code,
-                    detail=f"ML service error: {response.message}"
-                )
-
             ml_response = response.json()
             print(f'Response in Add user: {ml_response}')
+
+            # if response.status_code != 200:
+            #     raise HTTPException(
+            #         status_code=response.status_code,
+            #         detail=f"ML service error: {response.message}"
+            #     )
             
             if ml_response.get("is_saved") and ml_response.get("embedding"):
                 embedding = ml_response["embedding"]

@@ -121,7 +121,7 @@ async def add_user(
         
         # Generate embeddings
         embeddings = generate_face_embedding(image_array)
-        print(f"Generated embeddings for user {user_name}: {embeddings}")
+        print(f"Generated embeddings for user {user_name} with length:{len(embeddings)}")
         
         if embeddings is None:
             return AddUserResponse(
@@ -134,8 +134,8 @@ async def add_user(
         return AddUserResponse(
             is_saved=True,
             user_name=user_name,
-            message=f"User '{user_name}' added successfully",  # Removed "to the database" for consistency
-            embedding=embeddings.tolist()
+            message=f"User '{user_name}' added successfully",
+            embedding=embeddings.tolist() if isinstance(embeddings, np.ndarray) else embeddings
         )
     
     except Exception as e:
