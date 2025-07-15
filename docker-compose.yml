@@ -7,7 +7,7 @@ services:
       dockerfile: Dockerfile
     container_name: anti-spoofing-ml-model
     environment:
-      - MODELS_FOLDER=models
+      - MODELS_FOLDER=/app/models
       - MODEL_FILE_NAME=anti_spoofing_quantized.onnx
     volumes:
       - ./ml-model/models:/app/models
