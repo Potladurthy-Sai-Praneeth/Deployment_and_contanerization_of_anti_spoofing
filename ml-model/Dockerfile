@@ -71,10 +71,14 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /app
 COPY --from=base /root/.local /root/.local
 
-RUN curl -sSL "https://drive.usercontent.google.com/download?id=1p0abA5sYGOLoxdrJBuCz0iJyd5ZboJ6P&export=download" -o models.zip && \
-unzip models.zip -d app && \
-rm models.zip || echo "Model download failed, ensure models are copied manually"
-RUN ls -la /app/models/
+RUN mkdir -p /app/models
+COPY models/ /app/models/
+
+# RUN curl -sSL "https://drive.usercontent.google.com/download?id=1p0abA5sYGOLoxdrJBuCz0iJyd5ZboJ6P&export=download" -o models.zip && \
+# unzip models.zip  && \
+# rm models.zip || echo "Model download failed, ensure models are copied manually"
+
+RUN ls -la models/
 
 COPY . .
 EXPOSE 8000
