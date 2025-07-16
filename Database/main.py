@@ -61,9 +61,9 @@ def validate_user_name(user_name: str) -> str:
     return user_name.strip().lower()
 
 
-db_path = "database"
-if not os.path.exists(db_path):
-    os.makedirs(db_path)
+db_path = os.getenv("CHROMA_DB_PATH", "database")
+# if not os.path.exists(db_path):
+#     os.makedirs(db_path)
 
 # Global variables
 database_connector = Database(db_path=db_path)
@@ -90,13 +90,15 @@ async def add_user(image: UploadFile = File(..., description="User's face image"
         user_name = validate_user_name(user_name)
         all_users = await database_connector.get_registered_users()
 
-        if user_name in set(all_users):
+        # Check if user already exists - return early if they do
+        if user_name in all_users:
             return AddUserResponse(
                 is_saved=False,
                 user_name=user_name,
                 message=f"User '{user_name}' already exists"
             )
 
+        # User doesn't exist, proceed with ML service call
         async with httpx.AsyncClient() as client:
             contents = await image.read()
             files = {'image': (image.filename, contents, image.content_type)}
@@ -110,35 +112,32 @@ async def add_user(image: UploadFile = File(..., description="User's face image"
             )
 
             ml_response = response.json()
-            # print(f'Response in Add user: {ml_response}')
+            print(f'Response in Add user: {ml_response}')
 
-            # if response.status_code != 200:
-            #     raise HTTPException(
-            #         status_code=response.status_code,
-            #         detail=f"ML service error: {response.message}"
-            #     )
-            
+            # Check if ML service successfully generated embedding
             if ml_response.get("is_saved") and ml_response.get("embedding"):
                 embedding = ml_response["embedding"]
+                
+                # Insert into database
                 is_saved = await database_connector.insert(user_name, embedding)
-
-                if not is_saved:
+                
+                if is_saved:
+                    return AddUserResponse(
+                        is_saved=True,
+                        user_name=user_name,
+                        message=f"User '{user_name}' added successfully"
+                    )
+                else:
                     return AddUserResponse(
                         is_saved=False,
                         user_name=user_name,
-                        message=f"User '{user_name}' already exists"
+                        message=f"Failed to save user '{user_name}' to database"
                     )
-                
-                return AddUserResponse(
-                    is_saved=is_saved,
-                    user_name=user_name,
-                    message=f"User '{user_name}' added successfully"
-                )
             else:
                 return AddUserResponse(
                     is_saved=False,
                     user_name=user_name,
-                    message=ml_response.get("message","Failed to generate embeddings - no face detected or invalid image"),
+                    message=ml_response.get("message", "Failed to generate embeddings - no face detected or invalid image")
                 )
                 
     except httpx.RequestError as e:
@@ -156,7 +155,7 @@ async def add_user(image: UploadFile = File(..., description="User's face image"
 @api.post("/authenticate", response_model=AuthenticateResponse)
 async def authenticate_user(
     image: str = Form(..., description="Base64 encoded image data"),
-    threshold: float = Form(0.6, description="Distance threshold for authentication")
+    threshold: float = Form(0.5, description="Distance threshold for authentication")
 ) -> AuthenticateResponse:
     """Authenticate a user by comparing against stored embeddings via ML service."""
     try:
@@ -183,7 +182,7 @@ async def authenticate_user(
             )
 
             ml_response = response.json()
-            # print(f'Response in Authenticate user: {ml_response}')
+            print(f'Response in Authenticate user: {ml_response}')
 
             if response.status_code != 200:
                 raise HTTPException(

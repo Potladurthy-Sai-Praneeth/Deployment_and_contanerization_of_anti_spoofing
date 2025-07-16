@@ -10,8 +10,7 @@ class Database:
         self._initialize_collection()
         self.collection = self.client.get_collection(name=self.collection_name)
 
-    def _initialize_collection(self):
-        """Initialize the ChromaDB collection if it does not exist."""
+    def _initialize_collection(self):        
         print("Initializing ChromaDB collection...")
         existing_collections = [col.name for col in self.client.list_collections()]
         if self.collection_name not in existing_collections:
@@ -26,28 +25,20 @@ class Database:
         if embedding is None or not isinstance(embedding, list):
             raise ValueError(f"Embedding must be a non-empty list. Found {type(embedding)}")
         
-        # Check if user already exists
         try:
-            existing_users = self.collection.get(include=['documents'])
-            if existing_users and len(existing_users['documents']) > 0:
-                print(f"User {user_name} already exists in the collection. Skipping insertion.")
-                return False
+            print(f"Inserting user {user_name} into the collection...")
+            # Insert user_name, embedding pair into the collection
+            self.collection.add(
+                ids=[user_name],  # Use user_name as unique ID
+                documents=[user_name],
+                embeddings=[embedding],
+                metadatas=[{"user_name": user_name}]
+            )
+            print(f"User {user_name} inserted successfully.")
+            return True
         except Exception as e:
-            # User doesn't exist, continue with insertion
-            print(f'Got exception {e} while checking for existing user {user_name}.')
+            print(f"Error inserting user {user_name}: {e}")
             return False
-        
-        print(f"Inserting user {user_name} into the collection...")
-        # print(f"Embedding length: {len(embedding)}")
-        # Inserting a user_name , embedding pair into the collection
-        self.collection.add(
-            ids=[user_name],  # Use user_name as unique ID
-            documents=[user_name],
-            embeddings=[embedding],
-            metadatas=[{"user_name": user_name}]
-        )
-
-        return True
     
     async def fetch_all(self):
         """Fetch all users and their embeddings from the collection."""
@@ -55,13 +46,27 @@ class Database:
             raise ValueError("Collection is not initialized.")
         
         print("Fetching all users from the collection...")
-        results = self.collection.get(include=['documents', 'embeddings', 'metadatas'])
+        try:
+            results = self.collection.get(include=['documents', 'embeddings', 'metadatas'])
 
-        if not results or not results.get('documents') or len(results.get('embeddings', [])) == 0:
-            return {}
+            if not results or not results.get('documents') or len(results.get('embeddings', [])) == 0:
+                return {}
             
-        return {doc: emb.tolist() for doc, emb in zip(results['documents'], results['embeddings'])}
-
+            user_embeddings = {}
+            for doc, emb in zip(results['documents'], results['embeddings']):
+                try:
+                    if hasattr(emb, 'tolist'):
+                        user_embeddings[doc] = emb.tolist()
+                    else:
+                        user_embeddings[doc] = list(emb)
+                except Exception as e:
+                    print(f"Error converting embedding for user {doc}: {e}")
+                    continue
+            
+            return user_embeddings
+        except Exception as e:
+            print(f"Error fetching all users: {e}")
+            return {}
 
     async def get_registered_users(self):
         """Get all registered users from the collection."""
@@ -81,16 +86,16 @@ class Database:
         print(f"Deleting user {user_name} from the collection...")
         try:
             existing_users = self.collection.get(ids=[user_name])
-            if not existing_users or len(existing_users['documents']) == 0:
+            if not existing_users or not existing_users.get('ids') or len(existing_users['ids']) == 0:
                 print(f"User {user_name} does not exist in the collection.")
                 return False
-        except Exception as e:
-            print(f"User {user_name} does not exist in the collection.")
-            return False
             
-        self.collection.delete(ids=[user_name])
-        print(f"User {user_name} deleted successfully.")
-        return True
+            self.collection.delete(ids=[user_name])
+            print(f"User {user_name} deleted successfully.")
+            return True
+        except Exception as e:
+            print(f"Error deleting user {user_name}: {e}")
+            return False
     
     def close(self):
         """Close the database connection."""

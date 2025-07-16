@@ -38,6 +38,7 @@ services:
       - anti-spoofing-network
     environment:
       - ML_SERVICE_URL=http://ml-model:8000
+      - CHROMA_DB_PATH=database
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8001/docs"]
       interval: 30s
