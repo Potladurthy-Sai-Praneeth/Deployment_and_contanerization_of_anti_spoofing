@@ -57,6 +57,12 @@ const AddUserTab = ({ onUserAdded }) => {
         setSelectedFile(null);
         setPreviewUrl(null);
         
+        // Clear file input
+        const fileInput = document.getElementById('userImage');
+        if (fileInput) {
+          fileInput.value = '';
+        }
+        
         // Notify parent component to refresh user list
         if (onUserAdded) {
           onUserAdded();
@@ -69,9 +75,19 @@ const AddUserTab = ({ onUserAdded }) => {
       }
     } catch (error) {
       console.error('Add user error:', error);
+      let errorMessage = 'Failed to add user. Please try again.';
+      
+      if (error.response?.status === 503) {
+        errorMessage = 'Service temporarily unavailable. Please try again in a moment.';
+      } else if (error.response?.data?.detail) {
+        errorMessage = error.response.data.detail;
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
       setResult({
         type: 'error',
-        message: error.response?.data?.detail || 'Failed to add user. Please try again.'
+        message: errorMessage
       });
     } finally {
       setIsProcessing(false);
