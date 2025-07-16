@@ -61,9 +61,9 @@ def validate_user_name(user_name: str) -> str:
     return user_name.strip().lower()
 
 
-db_path = os.getenv("CHROMA_DB_PATH", "database")
-# if not os.path.exists(db_path):
-#     os.makedirs(db_path)
+db_path = "database"
+if not os.path.exists(db_path):
+    os.makedirs(db_path)
 
 # Global variables
 database_connector = Database(db_path=db_path)
