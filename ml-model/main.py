@@ -90,6 +90,21 @@ def validate_user_name(user_name: str) -> str:
 
 # API Endpoints
 
+@app.get("/health")
+async def health_check():
+    """Health check endpoint."""
+    try:
+        return {
+            "status": "healthy",
+            "message": "ML service is running",
+            "model_loaded": authenticator is not None,
+            "image_size": image_size,
+            "provider": provider
+        }
+    except Exception as e:
+        return {"status": "unhealthy", "message": str(e)}
+
+
 @app.post("/getEmbedding", response_model=AddUserResponse)
 async def add_user(
     image: UploadFile = File(..., description="User's face image"),
@@ -100,46 +115,95 @@ async def add_user(
         # Validate inputs
         validate_image_file(image)
         user_name = validate_user_name(user_name)
-    except HTTPException:
-        raise
-    except Exception as e:
-        print(f'Validation Error: {str(e)}')
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Invalid input: {str(e)}"
-        )
-    
-    try:
+        
         # Process image
         contents = await image.read()
-        pil_image = Image.open(BytesIO(contents))
         
-        if pil_image.mode != 'RGB':
-            pil_image = pil_image.convert('RGB')
-        
-        image_array = np.array(pil_image)
-        
-        # Generate embeddings
-        embeddings = generate_face_embedding(image_array)
-        print(f"Generated embeddings for user {user_name} with length:{len(embeddings)}")
-        
-        if embeddings is None:
+        # Validate image content
+        if len(contents) == 0:
             return AddUserResponse(
                 is_saved=False,
                 user_name=user_name,
-                message="Failed to generate embeddings - no face detected or invalid image",
+                message="Empty image file",
                 embedding=None
             )
         
-        return AddUserResponse(
-            is_saved=True,
-            user_name=user_name,
-            message=f"User '{user_name}' added successfully",
-            embedding=embeddings.tolist() if isinstance(embeddings, np.ndarray) else embeddings
-        )
+        try:
+            pil_image = Image.open(BytesIO(contents))
+            
+            if pil_image.mode != 'RGB':
+                pil_image = pil_image.convert('RGB')
+            
+            image_array = np.array(pil_image)
+            
+            # Validate image dimensions
+            if image_array.size == 0:
+                return AddUserResponse(
+                    is_saved=False,
+                    user_name=user_name,
+                    message="Invalid image: empty image array",
+                    embedding=None
+                )
+            
+            print(f"Processing image for user '{user_name}' with shape: {image_array.shape}")
+            
+        except Exception as e:
+            print(f'Image processing error: {str(e)}')
+            return AddUserResponse(
+                is_saved=False,
+                user_name=user_name,
+                message=f"Failed to process image: {str(e)}",
+                embedding=None
+            )
+        
+        # Generate embeddings
+        try:
+            embeddings = generate_face_embedding(image_array)
+            print(f"Generated embeddings for user '{user_name}' - type: {type(embeddings)}, length: {len(embeddings) if embeddings is not None else 'None'}")
+            
+            if embeddings is None:
+                return AddUserResponse(
+                    is_saved=False,
+                    user_name=user_name,
+                    message="Failed to generate embeddings - no face detected or invalid image",
+                    embedding=None
+                )
+            
+            # Convert to list format
+            if isinstance(embeddings, np.ndarray):
+                embeddings_list = embeddings.tolist()
+            else:
+                embeddings_list = embeddings
+            
+            # Validate embedding format
+            if not isinstance(embeddings_list, list) or len(embeddings_list) == 0:
+                return AddUserResponse(
+                    is_saved=False,
+                    user_name=user_name,
+                    message="Invalid embedding format generated",
+                    embedding=None
+                )
+            
+            return AddUserResponse(
+                is_saved=True,
+                user_name=user_name,
+                message=f"User '{user_name}' embeddings generated successfully",
+                embedding=embeddings_list
+            )
+            
+        except Exception as e:
+            print(f'Embedding generation error: {str(e)}')
+            return AddUserResponse(
+                is_saved=False,
+                user_name=user_name,
+                message=f"Failed to generate embeddings: {str(e)}",
+                embedding=None
+            )
     
+    except HTTPException:
+        raise
     except Exception as e:
-        print(f'Processing Error: {str(e)}')
+        print(f'Unexpected error in add_user: {str(e)}')
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"An error occurred during processing: {str(e)}"

@@ -33,7 +33,9 @@ export const apiService = {
   // Authenticate user with base64 image
   authenticateUser: async (imageData, threshold = 0.6) => {
     const formData = new FormData();
-    formData.append('image', imageData);
+    // Remove data URL prefix if present
+    const base64Data = imageData.includes(',') ? imageData.split(',')[1] : imageData;
+    formData.append('image', base64Data);
     formData.append('threshold', threshold.toString());
     
     const response = await api.post('/authenticate', formData, {
@@ -46,8 +48,16 @@ export const apiService = {
 
   // Add new user
   addUser: async (userName, imageFile) => {
+    if (!userName || !userName.trim()) {
+      throw new Error('User name is required');
+    }
+    
+    if (!imageFile) {
+      throw new Error('Image file is required');
+    }
+    
     const formData = new FormData();
-    formData.append('user_name', userName);
+    formData.append('user_name', userName.trim().toLowerCase());
     formData.append('image', imageFile);
     
     const response = await api.post('/addUser', formData, {
@@ -66,7 +76,17 @@ export const apiService = {
 
   // Delete user
   deleteUser: async (userName) => {
-    const response = await api.delete(`/deleteUser/${encodeURIComponent(userName)}`);
+    if (!userName || !userName.trim()) {
+      throw new Error('User name is required');
+    }
+    
+    const response = await api.delete(`/deleteUser/${encodeURIComponent(userName.trim().toLowerCase())}`);
+    return response.data;
+  },
+
+  // Health check
+  checkHealth: async () => {
+    const response = await api.get('/health');
     return response.data;
   },
 };

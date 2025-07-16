@@ -1,0 +1,6 @@
+test_system.sh
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.db
