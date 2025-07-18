@@ -9,6 +9,8 @@ services:
     environment:
       - MODELS_FOLDER=/app/models
       - MODEL_FILE_NAME=anti_spoofing_quantized.onnx
+      - IMAGE_SIZE=252
+      - EXECUTION_PROVIDER=CPUExecutionProvider
     volumes:
       - ./ml-model/models:/app/models
     ports:
@@ -17,7 +19,7 @@ services:
       - anti-spoofing-network
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
-      interval: 30s
+      interval: 60s
       timeout: 10s
       retries: 5
       start_period: 60s
@@ -32,6 +34,8 @@ services:
     depends_on:
       ml-model:
         condition: service_healthy
+      ui:
+        condition: service_healthy
     ports:
       - "8001:8001"
     networks:
@@ -39,21 +43,22 @@ services:
     environment:
       - ML_SERVICE_URL=http://ml-model:8000
       - CHROMA_DB_PATH=/api/database
+      - ML_MODEL_PORT=8000
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
-      interval: 30s
+      interval: 60s
       timeout: 10s
       retries: 3
-      start_period: 30s
+      start_period: 60s
   
   ui:
     build:
       context: ./UI
       dockerfile: Dockerfile
     container_name: anti-spoofing-ui
-    depends_on:
-      database:
-        condition: service_healthy
+    # depends_on:
+    #   database:
+    #     condition: service_healthy
     ports:
       - "5000:5000"
     networks:
@@ -62,10 +67,10 @@ services:
       - REACT_APP_API_URL=http://database:8001
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5000"]
-      interval: 30s
+      interval: 60s
       timeout: 10s
       retries: 3
-      start_period: 30s
+      start_period: 60s
 
 volumes:
   ml-models:

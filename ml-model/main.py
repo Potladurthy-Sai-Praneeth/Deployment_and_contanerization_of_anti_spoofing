@@ -11,6 +11,7 @@ from PIL import Image
 from generate_embedding import generate_face_embedding
 from authenticate import FaceAuthenticator
 import uvicorn
+import os
 
 
 class AddUserResponse(BaseModel):
@@ -40,10 +41,10 @@ app.add_middleware(
 )
 
 # Global variables
-image_size = (252, 252)
-provider = 'CPUExecutionProvider'  # Change to 'CUDAExecutionProvider' if GPU is available
+size = os.getenv("IMAGE_SIZE", "252")  # Default to 252 if not set
+provider = os.getenv('EXECUTION_PROVIDER','CPUExecutionProvider')  # Change to 'CUDAExecutionProvider' if GPU is available
 
-authenticator = FaceAuthenticator(execution_provider=provider, image_size=image_size)
+authenticator = FaceAuthenticator(execution_provider=provider, image_size=(int(size), int(size)))
 
 def decode_base64_image(image_data: str) -> np.ndarray:
     """Decode base64 image to numpy array using PIL"""
@@ -98,7 +99,7 @@ async def health_check():
             "status": "healthy",
             "message": "ML service is running",
             "model_loaded": authenticator is not None,
-            "image_size": image_size,
+            "image_size": (int(size), int(size)),
             "provider": provider
         }
     except Exception as e:

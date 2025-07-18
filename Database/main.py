@@ -36,7 +36,7 @@ class AuthenticateResponse(BaseModel):
 # Global variables
 db_path = os.getenv("CHROMA_DB_PATH", "/api/database")
 database_connector = None
-ML_MODEL_PORT = 8000  # Port where the ML model service is running
+ML_MODEL_PORT = os.getenv('ML_MODEL_PORT',8000)  # Port where the ML model service is running
 ML_SERVICE_URL = os.getenv("ML_SERVICE_URL", f"http://ml-model:{ML_MODEL_PORT}")
 
 
@@ -86,16 +86,20 @@ def validate_user_name(user_name: str) -> str:
         )
     return user_name.strip().lower()
 
-
-@api.get("/getAllUsers", response_model=FetchUserNamesResponse)
-async def get_all_users():
-    """Fetch all users and their embeddings from the database."""
+def validate_db_connection():
+    """Ensure database connection is initialized"""
     if database_connector is None:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="Database not initialized"
         )
-    
+    return
+
+
+@api.get("/getAllUsers", response_model=FetchUserNamesResponse)
+async def get_all_users():
+    """Fetch all users and their embeddings from the database."""
+    validate_db_connection()
     try:
         results = await database_connector.get_registered_users()
         return FetchUserNamesResponse(user_names=results)
@@ -109,11 +113,7 @@ async def get_all_users():
 @api.post("/addUser", response_model=AddUserResponse)
 async def add_user(image: UploadFile = File(..., description="User's face image"),user_name: str = Form(..., description="User's name")):
     """Add a new user with their face embedding."""
-    if database_connector is None:
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Database not initialized"
-        )
+    validate_db_connection()
     
     try:
         user_name = validate_user_name(user_name)
@@ -157,7 +157,7 @@ async def add_user(image: UploadFile = File(..., description="User's face image"
                     )
 
                 ml_response = response.json()
-                print(f'Response in Add user: {ml_response}')
+                # print(f'Response in Add user: {ml_response}')
 
                 # Check if ML service successfully generated embedding
                 if ml_response.get("is_saved") and ml_response.get("embedding"):
@@ -222,19 +222,19 @@ async def authenticate_user(
     threshold: float = Form(0.5, description="Distance threshold for authentication")
 ) -> AuthenticateResponse:
     """Authenticate a user by comparing against stored embeddings via ML service."""
-    if database_connector is None:
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Database not initialized"
-        )
+    validate_db_connection()
     
     try:
         known_face_embeddings_dict = await database_connector.fetch_all()
 
         if not known_face_embeddings_dict:
-            return AuthenticateResponse(
-                is_authenticated=False,
-                user_name=None
+            # return AuthenticateResponse(
+            #     is_authenticated=False,
+            #     user_name=None
+            # )
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="No registered users found. Please register users first."
             )
         
         try:
@@ -258,7 +258,7 @@ async def authenticate_user(
                     )
 
                 ml_response = response.json()
-                print(f'Response in Authenticate user: {ml_response}')
+                # print(f'Response in Authenticate user: {ml_response}')
                 
                 return AuthenticateResponse(
                     is_authenticated=ml_response.get("is_authenticated", False),
@@ -306,11 +306,7 @@ async def health_check():
 @api.delete("/deleteUser/{user_name}", response_model=DeleteUserResponse)
 async def delete_user(user_name: str) -> DeleteUserResponse:
     """Delete a user from the database."""
-    if database_connector is None:
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Database not initialized"
-        )
+    validate_db_connection()
     
     try:
         user_name = validate_user_name(user_name)

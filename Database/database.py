@@ -55,14 +55,13 @@ class Database:
             raise ValueError(f"Embedding must be a non-empty list. Found {type(embedding)} with length {len(embedding) if embedding else 0}")
         
         try:
-            print(f"Inserting user '{user_name}' into the collection...")
-            
             # Check if user already exists
             existing_users = self.collection.get(ids=[user_name])
             if existing_users and existing_users.get('ids') and len(existing_users['ids']) > 0:
                 print(f"User '{user_name}' already exists in collection")
                 return False
             
+            print(f"Inserting user '{user_name}' into the collection...")
             # Insert user_name, embedding pair into the collection
             self.collection.add(
                 ids=[user_name],  # Use user_name as unique ID
