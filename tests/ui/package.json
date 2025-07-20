@@ -21,9 +21,15 @@
     "identity-obj-proxy": "^3.0.0"
   },
   "scripts": {
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage",
-    "test:ci": "jest --ci --coverage --watchAll=false"
+    "test": "jest --verbose",
+    "test:watch": "jest --watch --verbose",
+    "test:coverage": "jest --coverage --verbose",
+    "test:ci": "jest --ci --coverage --watchAll=false --verbose",
+    "test:app": "jest test_app.test.js --verbose",
+    "test:components": "jest test_components.test.js --verbose",
+    "test:api": "jest test_api_service.test.js --verbose",
+    "test:integration": "jest test_integration.test.js --verbose",
+    "test:unit": "jest test_app.test.js test_components.test.js --verbose",
+    "test:all": "jest --coverage --verbose"
   }
 }

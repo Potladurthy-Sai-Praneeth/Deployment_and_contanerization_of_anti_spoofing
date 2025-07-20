@@ -27,7 +27,7 @@ jobs:
       uses: actions/cache@v4
       with:
         path: ml-model/.cache
-        key: ${{ runner.os }}-ml-model-${{ hashFiles('**/ml-model/requirements.txt',) }}
+        key: ${{ runner.os }}-ml-model-${{ hashFiles('**/ml-model/requirements.txt', '**/tests/ml-model/requirements-test.txt') }}
         restore-keys: |
           ${{ runner.os }}-ml-model-
 
@@ -68,7 +68,15 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r Database/requirements.txt
         pip install -r tests/Database/requirements-test.txt
-      
+    
+    - name: cache Database dependencies
+      uses: actions/cache@v4
+      with:
+        path: Database/.cache
+        key: ${{ runner.os }}-Database-${{ hashFiles('**/Database/requirements.txt', '**/tests/Database/requirements-test.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-Database-
+
     - name: Run Database unit tests
       run: |
         cd tests/Database
