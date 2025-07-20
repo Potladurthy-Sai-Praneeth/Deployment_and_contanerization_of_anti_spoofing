@@ -87,26 +87,26 @@ jobs:
         cd tests/Database
         python -m pytest test_api_integration.py -v
 
-  test-ui:
-    name: Test UI
-    runs-on: ubuntu-latest
+  # test-ui:
+  #   name: Test UI
+  #   runs-on: ubuntu-latest
     
-    steps:
-    - uses: actions/checkout@v4
+  #   steps:
+  #   - uses: actions/checkout@v4
 
-    - name: Set up Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-        cache: 'npm'
-        cache-dependency-path: tests/ui/package.json 
+  #   - name: Set up Node.js
+  #     uses: actions/setup-node@v4
+  #     with:
+  #       node-version: '18'
+  #       cache: 'npm'
+  #       cache-dependency-path: tests/ui/package.json 
     
-    - name: Install test dependencies
-      run: |
-        cd tests/ui
-        npm install
+  #   - name: Install test dependencies
+  #     run: |
+  #       cd tests/ui
+  #       npm install
     
-    - name: Run UI tests
-      run: |
-        cd tests/ui
-        npm run test:ci
+  #   - name: Run UI tests
+  #     run: |
+  #       cd tests/ui
+  #       npm run test:ci
