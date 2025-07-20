@@ -39,7 +39,7 @@ class TestGenerateEmbedding:
             
             assert embedding is not None
             assert len(embedding) == 128
-            assert isinstance(embedding, list)
+            assert isinstance(embedding, np.ndarray)
             assert all(isinstance(x, float) for x in embedding)
     
     def test_generate_face_embedding_no_face(self, sample_image_array):
@@ -67,8 +67,8 @@ class TestGenerateEmbedding:
     def test_generate_face_embedding_invalid_input(self):
         """Test embedding generation with invalid input"""
         # Test with None input
-        embedding = generate_face_embedding(None)
-        assert embedding is None
+        with pytest.raises(ValueError):
+            generate_face_embedding(None)
         
         # Test with invalid array shape
         invalid_array = np.array([1, 2, 3])

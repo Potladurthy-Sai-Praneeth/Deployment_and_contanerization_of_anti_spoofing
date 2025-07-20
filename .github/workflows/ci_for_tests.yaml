@@ -27,6 +27,8 @@ jobs:
       env:
         IMAGE_SIZE: "252"
         EXECUTION_PROVIDER: 'CPUExecutionProvider'
+        MODELS_FOLDER: "./ml-model/models"
+        MODEL_FILE_NAME: "anti_spoofing_quantized.onnx"
       run: |
         cd tests/ml-model
         python -m pytest test_ml_models.py -v
@@ -35,6 +37,8 @@ jobs:
       env:
         IMAGE_SIZE: "252"
         EXECUTION_PROVIDER: 'CPUExecutionProvider'
+        MODELS_FOLDER: "./ml-model/models"
+        MODEL_FILE_NAME: "anti_spoofing_quantized.onnx"
       run: |
         cd tests/ml-model
         python -m pytest test_ml_api_integration.py -v

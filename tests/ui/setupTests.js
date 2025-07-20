@@ -1,5 +1,7 @@
+// Jest setup file for UI tests
 import '@testing-library/jest-dom';
-import React from 'react';
+
+// Additional test setup can be added here
 
 // Make React available globally for tests
 global.React = React;

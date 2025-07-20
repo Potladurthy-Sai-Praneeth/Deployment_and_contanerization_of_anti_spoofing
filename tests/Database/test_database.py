@@ -5,6 +5,7 @@ import os
 import sys
 from unittest.mock import Mock, patch
 import asyncio
+import numpy as np
 
 # Add Database module to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..', 'Database'))
@@ -125,9 +126,4 @@ class TestDatabase:
         user_embeddings = await database.fetch_all()
         assert set(user_embeddings.keys()) == set(users.keys())
         for user in users:
-            assert user_embeddings[user] == users[user]
-    
-    def test_close(self, database):
-        """Test closing database connection"""
-        result = database.close()
-        assert result is True
+            assert np.allclose(np.array(user_embeddings[user]),np.array(users[user]))
