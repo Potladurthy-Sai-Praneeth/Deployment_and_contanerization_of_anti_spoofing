@@ -3,9 +3,6 @@
   "version": "1.0.0",
   "private": true,
   "dependencies": {
-    "@testing-library/jest-dom": "^5.16.4",
-    "@testing-library/react": "^13.3.0",
-    "@testing-library/user-event": "^13.5.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "axios": "^1.4.0",
@@ -17,30 +14,16 @@
     "@testing-library/user-event": "^13.5.0",
     "jest": "^27.5.1",
     "jest-environment-jsdom": "^27.5.1",
+    "@babel/core": "^7.22.0",
     "@babel/preset-env": "^7.22.0",
     "@babel/preset-react": "^7.22.0",
-    "babel-jest": "^27.5.1"
+    "babel-jest": "^27.5.1",
+    "identity-obj-proxy": "^3.0.0"
   },
   "scripts": {
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "test:ci": "jest --ci --coverage --watchAll=false"
-  },
-  "jest": {
-    "testEnvironment": "jsdom",
-    "setupFilesAfterEnv": ["<rootDir>/src/setupTests.js"],
-    "moduleNameMapping": {
-      "\\.(css|less|scss|sass)$": "identity-obj-proxy"
-    },
-    "collectCoverageFrom": [
-      "src/**/*.{js,jsx}",
-      "!src/index.js",
-      "!src/reportWebVitals.js"
-    ],
-    "coverageReporters": ["text", "lcov", "html"],
-    "testMatch": [
-      "<rootDir>/tests/**/*.test.js"
-    ]
   }
 }

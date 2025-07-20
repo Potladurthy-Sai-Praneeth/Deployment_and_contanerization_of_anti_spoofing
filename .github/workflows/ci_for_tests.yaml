@@ -23,21 +23,29 @@ jobs:
         pip install -r ml-model/requirements.txt
         pip install -r tests/ml-model/requirements-test.txt
     
+    - name: cache ml-model dependencies
+      uses: actions/cache@v4
+      with:
+        path: ml-model/.cache
+        key: ${{ runner.os }}-ml-model-${{ hashFiles('**/ml-model/requirements.txt',) }}
+        restore-keys: |
+          ${{ runner.os }}-ml-model-
+
     - name: Run ML-model unit tests
       env:
         IMAGE_SIZE: "252"
         EXECUTION_PROVIDER: 'CPUExecutionProvider'
-        MODELS_FOLDER: "./ml-model/models"
+        MODELS_FOLDER: "../../ml-model/models"
         MODEL_FILE_NAME: "anti_spoofing_quantized.onnx"
       run: |
         cd tests/ml-model
-        python -m pytest test_ml_models.py -v
+        python -m pytest test_ml_models.py -v  
     
     - name: Run ML-model API tests
       env:
         IMAGE_SIZE: "252"
         EXECUTION_PROVIDER: 'CPUExecutionProvider'
-        MODELS_FOLDER: "./ml-model/models"
+        MODELS_FOLDER: "../../ml-model/models"
         MODEL_FILE_NAME: "anti_spoofing_quantized.onnx"
       run: |
         cd tests/ml-model

@@ -1,9 +1,12 @@
 // Jest setup file for UI tests
-import '@testing-library/jest-dom';
+const { configure } = require('@testing-library/react');
+require('@testing-library/jest-dom');
 
-// Additional test setup can be added here
+// Configure testing library
+configure({ testIdAttribute: 'data-testid' });
 
 // Make React available globally for tests
+const React = require('react');
 global.React = React;
 
 // Mock environment variables
