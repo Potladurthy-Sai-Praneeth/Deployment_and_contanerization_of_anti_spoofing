@@ -1,0 +1,92 @@
+name: CI integration for automated testing on every push
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  test-ml-model:
+    name: Test ml-model service
+    runs-on: ubuntu-latest  
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.12'
+      
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r ml-model/requirements.txt
+        pip install -r tests/ml-model/requirements-test.txt
+    
+    - name: Run ML-model unit tests
+      env:
+        IMAGE_SIZE: "252"
+        EXECUTION_PROVIDER: 'CPUExecutionProvider'
+      run: |
+        cd tests/ml-model
+        python -m pytest test_ml_models.py -v
+    
+    - name: Run ML-model API tests
+      env:
+        IMAGE_SIZE: "252"
+        EXECUTION_PROVIDER: 'CPUExecutionProvider'
+      run: |
+        cd tests/ml-model
+        python -m pytest test_ml_api_integration.py -v
+
+  test-database:
+    name: Test Database service
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.12'
+      
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r Database/requirements.txt
+        pip install -r tests/Database/requirements-test.txt
+      
+    - name: Run Database unit tests
+      run: |
+        cd tests/Database
+        python -m pytest test_database.py -v
+    
+    - name: Run Database API tests
+      run: |
+        cd tests/Database
+        python -m pytest test_api_integration.py -v
+
+  test-ui:
+    name: Test UI
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: tests/ui/package.json 
+    
+    - name: Install test dependencies
+      run: |
+        cd tests/ui
+        npm install
+    
+    - name: Run UI tests
+      run: |
+        cd tests/ui
+        npm run test:ci

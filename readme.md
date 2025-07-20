@@ -1,6 +1,6 @@
 # Anti-Spoofing Face Recognition MLOps
 
-A production-ready anti-spoofing face recognition system built with MLOps best practices, featuring microservices architecture, containerized deployment, and orchestrated multi-service communication.
+A production-ready anti-spoofing face recognition system built with MLOps best practices, featuring microservices architecture, containerized deployment, orchestrated multi-service communication, and comprehensive testing infrastructure.
 
 ## 🎯 Project Overview
 
@@ -148,12 +148,76 @@ docker-compose logs <service-name>
 │   ├── models/                # ONNX model artifacts
 │   │   └── anti_spoofing_quantized.onnx
 │   └── requirements.txt       # ML-specific dependencies
-└── UI/                        # React Frontend
-    ├── Dockerfile             # Node.js build + production serve
-    ├── src/                   # React source code
-    │   ├── components/        # Reusable UI components
-    │   ├── pages/            # Application pages
-    │   └── utils/            # Helper functions
-    ├── public/               # Static assets
-    └── package.json          # Node.js dependencies
+├── UI/                        # React Frontend
+│   ├── Dockerfile             # Node.js build + production serve
+│   ├── src/                   # React source code
+│   │   ├── components/        # Reusable UI components
+│   │   ├── pages/            # Application pages
+│   │   └── utils/            # Helper functions
+│   ├── public/               # Static assets
+│   └── package.json          # Node.js dependencies
+├── tests/                     # Comprehensive test suite
+│   ├── database/             # Database service tests
+│   │   ├── test_database.py           # Unit tests
+│   │   ├── test_api_integration.py    # Integration tests
+│   │   └── requirements-test.txt      # Test dependencies
+│   ├── ml-model/             # ML model service tests
+│   │   ├── test_ml_models.py          # Unit tests
+│   │   ├── test_ml_api_integration.py # Integration tests
+│   │   └── requirements-test.txt      # Test dependencies
+│   ├── ui/                   # UI service tests
+│   │   ├── test_app.test.js           # App component tests
+│   │   ├── test_components.test.js    # Component tests
+│   │   ├── test_api_service.test.js   # API service tests
+│   │   └── package.json               # Test dependencies
+├── .github/                  # CI/CD configuration
+│   └── workflows/
+│       └── ci_for_tests.yml            # GitHub Actions workflow
+```
+
+## 🧪 Testing Infrastructure
+
+This project includes a comprehensive testing infrastructure designed for CI/CD pipelines:
+
+### Test Structure
+- **Unit Tests**: Test individual functions and classes in isolation
+- **Integration Tests**: Test API endpoints and service interactions
+- **End-to-End Tests**: Test complete user workflows across services
+- **Security Tests**: Vulnerability scanning and code security analysis
+
+### Running Tests
+
+```bash
+# Install test dependencies
+make install-deps
+
+# Run all tests
+make test-all
+
+# Run specific service tests
+make test-database
+make test-ml-model  
+make test-ui
+
+# Run with integration tests (requires Docker)
+make test-all-full
+
+# Quick tests without coverage
+make test-quick
+
+# Clean up test artifacts
+make clean
+```
+
+### CI/CD Pipeline
+- **Automated Testing**: All tests run on every push and pull request
+- **Parallel Execution**: Services tested simultaneously for faster feedback
+- **Coverage Reports**: Code coverage tracked and reported
+- **Security Scanning**: Automated vulnerability detection
+- **Docker Integration**: Full system testing with containerized services
+
+### Test Coverage Requirements
+- **Database Service**: 80% minimum coverage
+- **ML Model Service**: 75% minimum coverage  
+- **UI Service**: 70% minimum coverage
 ```
