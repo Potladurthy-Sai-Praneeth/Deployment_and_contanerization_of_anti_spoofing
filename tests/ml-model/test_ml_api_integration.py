@@ -11,9 +11,7 @@ import io
 
 # Add ML model module to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..', 'ml-model'))
-
-from main import app
-
+from main import *
 
 class TestMLModelAPI:
     """Integration tests for ML Model API endpoints"""
@@ -150,7 +148,7 @@ class TestMLModelAPI:
     
     def test_authenticate_success(self, client, sample_base64_image, sample_known_faces):
         """Test successful authentication"""
-        with patch.object(client.app.state, 'authenticator') as mock_auth:
+        with patch('main.authenticator') as mock_auth:
             # Mock successful authentication
             mock_auth.authenticate = AsyncMock(return_value=(True, "test_user"))
             
@@ -234,8 +232,6 @@ class TestMLModelAPI:
     
     def test_decode_base64_image_success(self, sample_base64_image):
         """Test base64 image decoding"""
-        from main import decode_base64_image
-        
         result = decode_base64_image(sample_base64_image)
         assert isinstance(result, np.ndarray)
         assert len(result.shape) == 3  # Height, Width, Channels
@@ -243,8 +239,6 @@ class TestMLModelAPI:
     
     def test_decode_base64_image_invalid(self):
         """Test base64 image decoding with invalid data"""
-        from main import decode_base64_image
-        
         # Test with invalid base64
         with pytest.raises(Exception):
             decode_base64_image("invalid_base64")
@@ -255,7 +249,6 @@ class TestMLModelAPI:
     
     def test_validate_user_name(self):
         """Test user name validation"""
-        from main import validate_user_name
         
         # Valid user name
         assert validate_user_name("Test User") == "test user"

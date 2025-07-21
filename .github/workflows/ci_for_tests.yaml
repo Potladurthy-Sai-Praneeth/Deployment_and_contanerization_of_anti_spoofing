@@ -26,7 +26,7 @@ jobs:
     - name: cache ml-model dependencies
       uses: actions/cache@v4
       with:
-        path: ml-model/.cache
+        path: ~/.cache
         key: ${{ runner.os }}-ml-model-${{ hashFiles('**/ml-model/requirements.txt', '**/tests/ml-model/requirements-test.txt') }}
         restore-keys: |
           ${{ runner.os }}-ml-model-
@@ -35,7 +35,7 @@ jobs:
       env:
         IMAGE_SIZE: "252"
         EXECUTION_PROVIDER: 'CPUExecutionProvider'
-        MODELS_FOLDER: "../../ml-model/models"
+        MODELS_FOLDER: "../../ml-model/models"   # This path is relative to the current working directory
         MODEL_FILE_NAME: "anti_spoofing_quantized.onnx"
       run: |
         cd tests/ml-model
@@ -72,7 +72,7 @@ jobs:
     - name: cache Database dependencies
       uses: actions/cache@v4
       with:
-        path: Database/.cache
+        path: ~/.cache
         key: ${{ runner.os }}-Database-${{ hashFiles('**/Database/requirements.txt', '**/tests/Database/requirements-test.txt') }}
         restore-keys: |
           ${{ runner.os }}-Database-
