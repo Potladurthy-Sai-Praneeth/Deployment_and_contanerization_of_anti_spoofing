@@ -17,7 +17,7 @@ jobs:
       with:
         python-version: '3.12'
         cache: 'pip'
-        cache-dependency-path:
+        cache-dependency-path: |
           ml-model/requirements.txt
           tests/ml-model/requirements-test.txt
       
@@ -59,7 +59,7 @@ jobs:
       with:
         cache: 'pip'
         python-version: '3.12'
-        cache-dependency-path: 
+        cache-dependency-path: |
           Database/requirements.txt
           tests/Database/requirements-test.txt
       
