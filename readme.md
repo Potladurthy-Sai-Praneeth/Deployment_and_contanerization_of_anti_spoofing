@@ -102,8 +102,8 @@ This project demonstrates modern MLOps practices through a microservices-based f
 
 #### 1. **Clone and Setup**
 ```bash
-git clone https://github.com/yourusername/anti-spoofing-face-recognition-mlops.git
-cd anti-spoofing-face-recognition-mlops
+git clone https://github.com/Potladurthy-Sai-Praneeth/Deployment_and_contanerization_of_anti_spooing.git
+cd Deployment_and_contanerization_of_anti_spooing
 
 # Verify project structure
 ls -la
@@ -120,11 +120,6 @@ docker-compose up --build
 docker-compose ps
 ```
 
-# Should show all services as "Up (healthy)"
-# If any service shows "Up (unhealthy)", check logs:
-```bash
-docker-compose logs <service-name>
-```
 
 #### 4. **Access Services**
 - **Frontend**: http://localhost:5000 - Main user interface

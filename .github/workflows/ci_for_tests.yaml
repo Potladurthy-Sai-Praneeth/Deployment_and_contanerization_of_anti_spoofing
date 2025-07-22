@@ -1,7 +1,9 @@
 name: CI integration for automated testing on every push
 
 on:
-  push:
+  # push:
+  #   branches: [main]
+  pull_request:
     branches: [main]
 
 jobs:
