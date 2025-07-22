@@ -30,7 +30,6 @@ class TestDatabaseAPI:
             
             mock_db_class.return_value = mock_db_instance
             
-            
             from main import api
             return TestClient(api)
     
@@ -49,11 +48,13 @@ class TestDatabaseAPI:
     
     def test_health_check(self, client):
         """Test health check endpoint"""
-        
-        response = client.get("/health")
-        assert response.status_code == 200
-        data = response.json()
-        assert data["status"] == "healthy"
+        with patch('main.database_connector') as mock_db:
+            mock_db.get_registered_users = AsyncMock(return_value=[])
+            
+            response = client.get("/health")
+            assert response.status_code == 200
+            data = response.json()
+            assert data["status"] == "healthy"
     
     def test_addUser_success(self, client, mock_ml_service):
         """Test successful user addition"""
@@ -183,7 +184,8 @@ class TestDatabaseAPI:
         """Test authentication when no users are registered"""
         with patch('main.database_connector') as mock_db:
             mock_db.fetch_all = AsyncMock(return_value={})
-            
+            mock_db.get_registered_users = AsyncMock(return_value=[])
+
             data = {"image": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAAAAAAAD"}
             
             response = client.post("/authenticate", data=data)

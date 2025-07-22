@@ -228,10 +228,6 @@ async def authenticate_user(
         known_face_embeddings_dict = await database_connector.fetch_all()
 
         if not known_face_embeddings_dict:
-            # return AuthenticateResponse(
-            #     is_authenticated=False,
-            #     user_name=None
-            # )
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="No registered users found. Please register users first."
@@ -276,7 +272,9 @@ async def authenticate_user(
                 is_authenticated=False,
                 user_name=None
             )
-                
+    except HTTPException:
+        raise 
+    
     except Exception as e:
         print(f"Error in authenticate_user: {e}")
         raise HTTPException(
