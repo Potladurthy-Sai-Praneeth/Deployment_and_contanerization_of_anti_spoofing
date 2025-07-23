@@ -40,7 +40,7 @@ This project demonstrates modern MLOps practices through a microservices-based f
 
 #### 2. **Database API Service (Port 8001)**
 - **Purpose**: Central orchestrator managing business logic and data
-- **Technology**: FastAPI + SQLite/File-based storage
+- **Technology**: FastAPI + ChromaDB(vector database) for persistence
 - **Functions**:
   - User registration and management
   - Coordinates ML service calls
@@ -58,44 +58,24 @@ This project demonstrates modern MLOps practices through a microservices-based f
   - Results visualization
 - **Benefits**: Responsive design, real-time camera integration, modern UX
 
+
 ## 🚀 MLOps Features & Best Practices
 
 ### 1. **Containerized Microservices**
-
-**What**: Each service runs in its own Docker container with isolated dependencies.
-
-**Why**: 
-- **Environment Consistency**: "It works on my machine" problems eliminated
-- **Dependency Isolation**: No conflicts between service requirements
-- **Reproducible Deployments**: Same container works everywhere
-- **Resource Management**: Better control over CPU/memory allocation
-
 ### 2. **Service Orchestration with Docker Compose**
-
-**What**: Coordinated deployment and management of multiple containers.
-
-**Why**:
-- **Simplified Deployment**: Single command starts entire system
-- **Service Discovery**: Containers can find each other by service name
-- **Network Management**: Isolated networks for security
-- **Dependency Management**: Services start in correct order
-
 ### 3. **Inter-Service Communication**
+### 4. **CI/CD Pipeline**
 
-**What**: RESTful API communication between services with proper error handling.
 
-**How it Works**:
+## How it Works:
 1. **User Registration Flow**:
    ```
-   UI captures image → Database API receives request → 
-   Calls ML service for face processing → Stores embeddings → 
-   Returns success/failure to UI
+   UI captures image → Database API receives request →  Calls ML service for face processing → Stores embeddings →  Returns Success/failure to UI
    ```
 
 2. **Authentication Flow**:
    ```
-   UI captures image → Database API → ML service checks for spoofing → 
-   If real face, compare with stored embeddings → Return match result
+   UI captures image → Database API → ML service checks for spoofing →  If real face, compare with stored embeddings → Return match result
    ```
 
 ### Step-by-Step Deployment
@@ -104,22 +84,12 @@ This project demonstrates modern MLOps practices through a microservices-based f
 ```bash
 git clone https://github.com/Potladurthy-Sai-Praneeth/Deployment_and_contanerization_of_anti_spooing.git
 cd Deployment_and_contanerization_of_anti_spooing
-
-# Verify project structure
-ls -la
 ```
 
 #### 2. **Build and Start Services**
 ```bash
-# Build all images and start services
 docker-compose up --build
 ```
-#### 3. **Verify Deployment**
-```bash
-# Check all services are healthy
-docker-compose ps
-```
-
 
 #### 4. **Access Services**
 - **Frontend**: http://localhost:5000 - Main user interface
@@ -127,7 +97,7 @@ docker-compose ps
 - **ML Model Docs**: http://localhost:8000/docs - ML service documentation
 
 
-## 📁 Project Structure Explained
+## 📁 Project Structure
 
 ```
 ├── docker-compose.yml          # Orchestration configuration

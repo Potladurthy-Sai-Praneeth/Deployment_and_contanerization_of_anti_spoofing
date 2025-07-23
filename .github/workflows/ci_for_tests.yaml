@@ -1,10 +1,10 @@
 name: CI integration for automated testing on every push
 
 on:
-  # push:
-  #   branches: [main]
-  pull_request:
+  push:
     branches: [main]
+  # pull_request:
+  #   branches: [main]
 
 jobs:
   test-ml-model:
