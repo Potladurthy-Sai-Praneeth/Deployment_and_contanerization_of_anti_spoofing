@@ -86,7 +86,7 @@ class FaceAuthenticator:
         preprocessed_frame = self.preprocess_image(frame_rgb)  
 
         depth_input = {self.depth_map_model.get_inputs()[0].name: preprocessed_frame}
-        depth_map,output = await self.depth_map_model.run(None, depth_input)
+        depth_map,output = self.depth_map_model.run(None, depth_input)
         
         prediction = np.argmax(output, axis=1)[0]
         
