@@ -56,9 +56,6 @@ services:
       context: ./UI
       dockerfile: Dockerfile
     container_name: anti-spoofing-ui
-    # depends_on:
-    #   database:
-    #     condition: service_healthy
     ports:
       - "5000:5000"
     networks:
