@@ -1,5 +1,5 @@
-test_system.sh
 __pycache__/
+.env
 *.pyc
 *.pyo
 *.pyd

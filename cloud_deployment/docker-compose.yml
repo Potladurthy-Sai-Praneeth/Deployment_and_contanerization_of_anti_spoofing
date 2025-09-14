@@ -21,13 +21,7 @@ services:
       - anti-spoofing-network
 
   ml-model:
-    build: 
-      context: ./ml-model
-      dockerfile: Dockerfile
-      args:
-        AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
-        AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
-        AWS_REGION: ${AWS_REGION}
+    image: psp24/anti_spoofing_ml-model:latest
     container_name: anti-spoofing-ml-model
     environment:
       - MODELS_FOLDER=${MODELS_FOLDER}
@@ -36,8 +30,6 @@ services:
       - EXECUTION_PROVIDER=${EXECUTION_PROVIDER}
     volumes:
       - ml-models:/app/models
-    # ports:
-    #   - "8000:8000"
     networks:
       - anti-spoofing-network
     healthcheck:
@@ -48,9 +40,7 @@ services:
       start_period: 30s
   
   database:
-    build:
-      context: ./Database
-      dockerfile: Dockerfile
+    image: psp24/anti_spoofing_database:latest
     container_name: anti-spoofing-database
     volumes:
       - db-data:/api/database
@@ -59,8 +49,6 @@ services:
         condition: service_healthy
       ui:
         condition: service_healthy
-    # ports:
-    #   - "8001:8001"
     networks:
       - anti-spoofing-network
     environment:
@@ -75,14 +63,8 @@ services:
       start_period: 30s
   
   ui:
-    build:
-      context: ./UI
-      dockerfile: Dockerfile
-      args:
-        REACT_APP_API_URL: ${REACT_APP_API_URL}
+    image: psp24/anti_spoofing_ui:latest
     container_name: anti-spoofing-ui
-    # ports:
-    #   - "5000:5000"
     networks:
       - anti-spoofing-network
     environment:
