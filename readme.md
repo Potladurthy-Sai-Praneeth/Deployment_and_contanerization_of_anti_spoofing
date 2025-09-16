@@ -13,11 +13,19 @@ This project demonstrates modern MLOps practices through a microservices-based f
 ### Microservices Architecture Explained
 
 ```
-┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
-│   React UI      │    │   Database API   │    │   ML Model      │
-│   (Frontend)    │◄──►│   (Orchestrator) │◄──►│   (Inference)   │
-│   Port: 5000    │    │   Port: 8001     │    │   Port: 8000    │
-└─────────────────┘    └──────────────────┘    └─────────────────┘
+                            ┌─────────────────┐
+                            │  Nginx Proxy    │
+                            │  (Orchestrator) │
+                            │    Port: 80     │
+                            └─────────┬───────┘
+                                      │
+                ┌─────────────────────┼─────────────────────┐
+                │                     │                     │
+        ┌───────▼───────┐    ┌────────▼──────┐    ┌────────▼──────┐
+        │   React UI    │    │ Database API  │    │   ML Model    │
+        │  (Frontend)   │◄──►│  (Middleware) │◄──►│ (Inference)   │
+        │  Port: 5000   │    │  Port: 8001   │    │  Port: 8000   │
+        └───────────────┘    └───────────────┘    └───────────────┘
 ```
 
 **Why Microservices for ML?**
@@ -65,77 +73,56 @@ This project demonstrates modern MLOps practices through a microservices-based f
 ### 2. **Service Orchestration with Docker Compose**
 ### 3. **Inter-Service Communication**
 ### 4. **CI/CD Pipeline**
+### 5. **Comprehensive Testing**
 
 
 ## How it Works:
 1. **User Registration Flow**:
    ```
-   UI captures image → Database API receives request →  Calls ML service for face processing → Stores embeddings →  Returns Success/failure to UI
+   UI captures image → Nginx Proxy routes request → Database API receives request → Calls ML service for face processing → Stores embeddings → Returns Success/failure via Nginx → UI
    ```
 
 2. **Authentication Flow**:
    ```
-   UI captures image → Database API → ML service checks for spoofing →  If real face, compare with stored embeddings → Return match result
+   UI captures image → Nginx Proxy routes request → Database API → ML service checks for spoofing → If real face, compare with stored embeddings → Return match result via Nginx → UI
    ```
 
-### Step-by-Step Deployment
+## 🚀 Deployment Guide
+
+### Step-by-Step Local Deployment
 
 #### 1. **Clone and Setup**
 ```bash
 git clone https://github.com/Potladurthy-Sai-Praneeth/Deployment_and_contanerization_of_anti_spooing.git
-cd Deployment_and_contanerization_of_anti_spooing
+cd Deployment_and_contanerization_of_anti_spooing/cloud_deployment
 ```
 
 #### 2. **Build and Start Services**
 ```bash
-docker-compose up --build
+docker-compose up 
 ```
 
-#### 4. **Access Services**
-- **Frontend**: http://localhost:5000 - Main user interface
-- **Database API Docs**: http://localhost:8001/docs - API documentation  
-- **ML Model Docs**: http://localhost:8000/docs - ML service documentation
+#### 3. **Access Services**
+- **Web UI**: http://localhost
 
+### Cloud Deployment (AWS)
 
-## 📁 Project Structure
+#### 1. **Prerequisites**
+- AWS EC2 instance with Docker and Docker Compose installed
+- Security group configured to allow HTTP traffic on port 80
 
+#### 2. **Deploy to Cloud**
+```bash
+# SSH into your EC2 instance
+ssh -i your-key.pem ubuntu@your-ec2-ip
+
+# Clone the repository
+git clone https://github.com/Potladurthy-Sai-Praneeth/Deployment_and_contanerization_of_anti_spooing.git
+cd Deployment_and_contanerization_of_anti_spooing/cloud_deployment
+
+# Build and start services
+docker-compose up -d
 ```
-├── docker-compose.yml          # Orchestration configuration
-├── Database/                   # API Gateway & Business Logic
-│   ├── Dockerfile             # Container definition
-│   ├── main.py                # FastAPI application entry point
-│   ├── database.py            # Data persistence layer
-│   └── requirements.txt       # Python dependencies
-├── ml-model/                   # ML Inference Service
-│   ├── Dockerfile             # Multi-stage build for CV dependencies
-│   ├── main.py                # FastAPI ML API server
-│   ├── authenticate.py        # Face matching and anti-spoofing logic
-│   ├── models/                # ONNX model artifacts
-│   │   └── anti_spoofing_quantized.onnx
-│   └── requirements.txt       # ML-specific dependencies
-├── UI/                        # React Frontend
-│   ├── Dockerfile             # Node.js build + production serve
-│   ├── src/                   # React source code
-│   │   ├── components/        # Reusable UI components
-│   │   ├── pages/            # Application pages
-│   │   └── utils/            # Helper functions
-│   ├── public/               # Static assets
-│   └── package.json          # Node.js dependencies
-├── tests/                     # Comprehensive test suite
-│   ├── database/             # Database service tests
-│   │   ├── test_database.py           # Unit tests
-│   │   ├── test_api_integration.py    # Integration tests
-│   │   └── requirements-test.txt      # Test dependencies
-│   ├── ml-model/             # ML model service tests
-│   │   ├── test_ml_models.py          # Unit tests
-│   │   ├── test_ml_api_integration.py # Integration tests
-│   │   └── requirements-test.txt      # Test dependencies
-│   ├── ui/                   # UI service tests
-│   │   ├── test_app.test.js           # App component tests
-│   │   ├── test_components.test.js    # Component tests
-│   │   ├── test_api_service.test.js   # API service tests
-│   │   └── package.json               # Test dependencies
-├── .github/                  # CI/CD configuration
-│   └── workflows/
-│       └── ci_for_tests.yml            # GitHub Actions workflow
-```
+
+#### 3. **Access Live Application**
+- **Production Web UI**: http://amiaspoof.me || http://<your-ec2-ip>
