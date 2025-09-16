@@ -16,7 +16,7 @@ def generate_face_embedding(image):
         raise ValueError("Input image must be a numpy array.")
 
     try:
-        face_encodings = face_recognition.face_encodings(image)
+        face_encodings = face_recognition.face_encodings(image,num_jitters=2,model="large")
 
         if len(face_encodings) == 0:
             return None  # No faces found
